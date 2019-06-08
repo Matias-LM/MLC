@@ -110,6 +110,7 @@ class LoguedIn extends Component {
             
             var items = data;
             localStorage.setItem('user', JSON.stringify(items.results));
+            window.location.reload();
             /*var token = data;
             localStorage.setItem('token',JSON.stringify(token));
             console.log(token)  */  
