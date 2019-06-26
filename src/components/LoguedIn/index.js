@@ -1,5 +1,7 @@
 // Dependencies
 import React, { Component } from 'react';
+//import { Accordion, AccordionItem } from 'react-light-accordion';
+import 'react-light-accordion/demo/css/index.css';
 //import { objectExpression } from '@babel/types';
 //import { parse } from 'query-string';
 
@@ -40,11 +42,36 @@ var options = {
 
 };
 
+/*class List extends Component{
+
+  /*constructor(props) {
+    super(props);
+
+  }
+
+  render(){
+
+    return(
+
+      <div>
+        
+      </div>
+
+    );
+    
+  }
+
+  
+}*/
+  
+
+
 class LoguedIn extends Component {
 
   constructor(props) {
     super(props);
     this.state = {text: ''};
+    //this.state.products = {}
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -56,7 +83,8 @@ class LoguedIn extends Component {
 
   render() {
 
-    var printing = localStorage.getItem('user')
+    //<Accordion atomic={true} title={this.state.products}/>
+    var printing = localStorage.getItem('user');
     return (
 
       <div className="LoguedIn">
@@ -74,7 +102,8 @@ class LoguedIn extends Component {
             Buscar
           </button>
         </form>
-        <p>{printing}</p>
+        <ul>{printing}</ul>
+       
 
       </div>
 
@@ -109,6 +138,20 @@ class LoguedIn extends Component {
           .then(function(data) {
             
             var items = data;
+            //var timestamp = (new Date()).getTime();
+            /*items.results.forEach(element => {
+              
+              
+              this.setState({products: element});
+              
+
+            });*/
+            /*var titles = items.results.map(
+              function iterator(result){
+                return result.title
+              },
+              this
+            )*/
             localStorage.setItem('user', JSON.stringify(items.results));
             window.location.reload();
             /*var token = data;
