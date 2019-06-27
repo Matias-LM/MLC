@@ -1,13 +1,19 @@
 export default [
     
     {
-        title: 'Log In',
-        url: '/'
-    },
-    {
         title: 'Buscador',
         url: '/logued_in',
 
     },
+    {
+        title: 'Vendedores Seguidos',
+        url: '/FollowingSellers',
+
+    },
+    {
+        title: 'Productos Seguidos',
+        url: '/FollowingItems',
+
+    }
 
 ];
