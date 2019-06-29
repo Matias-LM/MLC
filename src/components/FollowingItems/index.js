@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import { Accordion, AccordionItem } from 'react-light-accordion';
 import axios from 'axios';
 //import Accordion from 'react-bootstrap/Accordion'
-import Card from 'react-bootstrap/Card'
 import "bootstrap/dist/css/bootstrap.min.css";
 import 'react-light-accordion/demo/css/index.css';
 
@@ -13,7 +11,7 @@ function isEmptyObject(obj){
 
 const Item = props => (
 
-    <AccordionItem title={props.item._name}>
+    <AccordionItem title={"Nombre: " + props.item._name + " Vendedor: " + props.item._seller}>
 
         <table className="table table-striped" style={{ marginTop: 20 }}>
 

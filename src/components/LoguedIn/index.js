@@ -139,6 +139,9 @@ class LoguedIn extends Component {
 
     //var algo = localStorage.getItem('user');
     //<Accordion atomic={true} title={this.state.products}/>
+    /*<button onClick={() => this.handleFollow()}>
+        Seguir
+      </button>*/
     return (
 
       <div className="LoguedIn">
@@ -156,9 +159,6 @@ class LoguedIn extends Component {
             Buscar 
           </button>
         </form>
-        <button onClick={() => this.handleFollow()}>
-            Seguir
-        </button>
         <table className="table table-striped" style={{ marginTop: 20 }}>
 
           <thead>
