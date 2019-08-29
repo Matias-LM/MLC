@@ -44,28 +44,6 @@ var options = {
   }
 
 };
-
-/*class List extends Component{
-
-  /*constructor(props) {
-    super(props);
-
-  }
-
-  render(){
-
-    return(
-
-      <div>
-        
-      </div>
-
-    );
-    
-  }
-
-  
-}*/
   
 function startFollowing(id, item){
 
@@ -200,19 +178,21 @@ class LoguedIn extends Component {
     }
     var username = this.state.text;
     localStorage.setItem('seller', username)
-    const URLSearchParams = window.URLSearchParams;
-    var burl = new URLSearchParams();
+    axios.get('http://localhost:4002/MLserver/searchItems/' + username)
+      .then(window.location.reload());
+    /*const URLSearchParams = window.URLSearchParams;
+    var burl = new URLSearchParams();*/
     /*burl.append("grant_type","authorization_code")
     burl.append("client_id", '1928415112086289')
     burl.append("client_secret", 'QOAOPJRyiMQgtW0HjF86OYS6Ky6fYR0a',)
     burl.append("code",parse(this.props.location.search).code);
     burl.append("redirect_uri",options.form.redirect_uri)*/
-    burl.append("nickname", username);
+    /*burl.append("nickname", username);
     var aurl = url + burl;
     fetch(aurl,options)
       .then(function(response){ 
 
-        return response.json()
+        response.json()
           .then(function(data) {
             
             var items = data;
@@ -240,7 +220,6 @@ class LoguedIn extends Component {
                       }
       
                     };
-                    //window.location.reload();
                     axios.post('http://localhost:4000/MLitems/add', obj)
                       .then(res => console.log(res.data));
                     return obj;
@@ -249,7 +228,7 @@ class LoguedIn extends Component {
 
                 })
               
-            })
+            }).then(window.location.reload());
             //var timestamp = (new Date()).getTime();
             /*items.results.forEach(element => {
               
@@ -268,14 +247,14 @@ class LoguedIn extends Component {
             //window.location.reload();
             /*var token = data;
             localStorage.setItem('token',JSON.stringify(token));
-            console.log(token)  */  
+            console.log(token) 
 
           })
           .catch(function(error) {
             console.log('Fetch Error:', error);
           });
 
-    });
+    });*/
 
   }
 

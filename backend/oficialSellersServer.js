@@ -4,7 +4,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const PORT = 4001;
+const PORT = 4000;
 
 let OfSel = require('./oficialSellers.model');
 

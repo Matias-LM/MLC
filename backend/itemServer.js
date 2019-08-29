@@ -6,7 +6,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const PORT = 4000;
 
-let Item = require('./items.model');
+let Item = require('./modelos/items.model');
 
 app.use(cors()); 
 app.use(bodyParser.json());

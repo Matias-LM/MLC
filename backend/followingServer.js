@@ -4,9 +4,9 @@ const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const PORT = 4002;
+const PORT = 4000;
 
-let OfSel = require('./following.model');
+let OfSel = require('./modelos/following.model');
 
 function isEmptyObject(obj){
     return !Object.keys(obj).length;
