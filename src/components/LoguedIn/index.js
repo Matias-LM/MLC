@@ -30,11 +30,6 @@ var options = {
     'Accept': 'application/json' 
 
   }*/
-  form: {
-
-    "nickname": 'HERRAMIENTASMATIAS'
-
-  },
   method: "GET",
   headers: {
 
@@ -48,7 +43,7 @@ var options = {
 function startFollowing(id, item){
 
   item._following = true;
-  axios.post('http://localhost:4000/MLitems/update/' + id, item)
+  axios.post('http://localhost:4000/MLHuergo/items/update/' + id, item)
     .then(function(data){
       //this.props.history.push('/FollowingItems');
   });
@@ -89,7 +84,7 @@ class LoguedIn extends Component {
 
   componentDidMount(){    
 
-    axios.get('http://localhost:4000/MLitems/searchSeller/' + localStorage.getItem('seller'))
+    axios.get('http://localhost:4000/MLHuergo/items/searchSeller/' + localStorage.getItem('seller'))
       .then(res => {
         if(!isEmptyObject(res.data)) this.setState({ items: res.data });
       })
@@ -178,83 +173,8 @@ class LoguedIn extends Component {
     }
     var username = this.state.text;
     localStorage.setItem('seller', username)
-    axios.get('http://localhost:4002/MLserver/searchItems/' + username)
+    axios.get('http://localhost:4000/MLHuergo/items/searchItems/' + username)
       .then(window.location.reload());
-    /*const URLSearchParams = window.URLSearchParams;
-    var burl = new URLSearchParams();*/
-    /*burl.append("grant_type","authorization_code")
-    burl.append("client_id", '1928415112086289')
-    burl.append("client_secret", 'QOAOPJRyiMQgtW0HjF86OYS6Ky6fYR0a',)
-    burl.append("code",parse(this.props.location.search).code);
-    burl.append("redirect_uri",options.form.redirect_uri)*/
-    /*burl.append("nickname", username);
-    var aurl = url + burl;
-    fetch(aurl,options)
-      .then(function(response){ 
-
-        response.json()
-          .then(function(data) {
-            
-            var items = data;
-            items.results.map(function(item){
-              
-              axios.get('http://localhost:4000/MLitems/searchItemId/' + item.id)
-                .then(res => {
-                  if(!isEmptyObject(res.data)) 
-                    return;
-                  else{
-
-                    var obj = {
-
-                      "_itemId": item.id,
-                      "_name": item.title,
-                      "_seller": username,
-                      "_following": false,
-                      "_data": {
-      
-                        "price": item.price,
-                        "currency": item.currency_id,
-                        "availableQuantity": item.available_quantity,
-                        "soldQuantity": item.sold_quantity
-      
-                      }
-      
-                    };
-                    axios.post('http://localhost:4000/MLitems/add', obj)
-                      .then(res => console.log(res.data));
-                    return obj;
-
-                  }
-
-                })
-              
-            }).then(window.location.reload());
-            //var timestamp = (new Date()).getTime();
-            /*items.results.forEach(element => {
-              
-              
-              this.setState({products: element});
-              
-
-            });*/
-            /*var titles = items.results.map(
-              function iterator(result){
-                return result.title
-              },
-              this
-            )*/
-            //localStorage.setItem('user', JSON.stringify(items.results));
-            //window.location.reload();
-            /*var token = data;
-            localStorage.setItem('token',JSON.stringify(token));
-            console.log(token) 
-
-          })
-          .catch(function(error) {
-            console.log('Fetch Error:', error);
-          });
-
-    });*/
 
   }
 
