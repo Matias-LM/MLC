@@ -1,11 +1,35 @@
-//const axios = require('axios');
+// Dependencies
 const express = require('express');
 const routes = express.Router();
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const fetch = require('node-fetch');
 const mongoose = require('mongoose');
+const request = require('request');
 const PORT = 4000;
+var valores = {
+
+    "grant_type":"authorization_code",
+    "client_id": '1928415112086289',
+    "client_secret": 'QOAOPJRyiMQgtW0HjF86OYS6Ky6fYR0a',
+    "redirect_uri": "http://localhost:3000/logued_in",
+    "code": ""
+
+};
+
+// Opciones que voy a tener que usar al momento de hacer el pedido del Token por mensaje POST.
+var options = {
+
+   url:'https://api.mercadolibre.com/oauth/token',
+   form: valores,
+   method: "POST",
+   headers: {
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'Accept': 'application/json'
+   }
+
+};
 
 //Aca importo los modelos para los jsons a guardar
 let Item = require('./modelos/items.model'); //Productos
@@ -16,7 +40,7 @@ let CatTend = require('./modelos/categoryTendency.model'); //Tendencias en el ti
 //Conecto las bases
 app.use(cors()); 
 app.use(bodyParser.json());
-app.use('/MLHuergo', routes);
+app.use('/MLHuergo', routes); //route.routes('/algo').get(function()); = app.get('MLHuergo/algo', function());
 
 mongoose.connect('mongodb://127.0.0.1:27017/MLHuergo', { useNewUrlParser: true });
 const connection = mongoose.connection;
@@ -30,11 +54,18 @@ app.listen(PORT, function() {
     console.log("Server is running on Port: " + PORT);
 });
 
+app.post('/token',function(req,rest){
+    var url = req.body.url;
+    request.post({url: url, json:true, options},function(req,res,body){
+        token = body
+        rest.send(token)
+    })
+})
+
 function isEmptyObject(obj){
     return !Object.keys(obj).length;
   }
 
-  
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////Funciones de los productos/////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,7 +93,8 @@ routes.route('/items/add').post(function(req, res) {
         .then(item => {
 
             res.status(200).json({'item': 'item added successfully'});
-
+            console.log(item);
+            
         })
         .catch(err => {
 
@@ -115,6 +147,22 @@ routes.route('/items/searchName/:name').get(function(req, res) {
 
 });
 
+
+routes.route('/items/searchItemId/:id').get(function(req, res) {
+
+    let id = req.params.id;
+    Item.find().byItemId(id).exec(function(err, item) {
+
+        console.log('Algo');
+        if(err)
+            console.log(err)
+        else
+            res.json(item);
+
+    });
+
+});
+
 routes.route('/items/searchItems/:username').get(function(req, res) {
 
     let username = req.params.username;
@@ -137,7 +185,7 @@ routes.route('/items/searchItems/:username').get(function(req, res) {
     var optionsPost = {
 
         method: "POST",
-        form : "Algo",
+        body: [],
         headers: {
       
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -158,37 +206,55 @@ routes.route('/items/searchItems/:username').get(function(req, res) {
               url = 'http://localhost:4000/MLHuergo/items/searchItemId/' + item.id
               //axios.get('http://localhost:4000/MLHuergo/items/searchItemId/' + item.id)
               fetch(url,options)
-                .then(res => {
-                  if(!isEmptyObject(res.data)) 
-                    return;
-                  else{
+                .then(function(resp){
+                    resp.json().then(function(res){
 
-                    var obj = {
+                        console.log(res);
+                        if(!isEmptyObject(res)) 
+                            return;
+                        else{
 
-                      "_itemId": item.id,
-                      "_name": item.title,
-                      "_seller": username,
-                      "_following": false,
-                      "_data": {
-      
-                        "price": item.price,
-                        "currency": item.currency_id,
-                        "availableQuantity": item.available_quantity,
-                        "soldQuantity": item.sold_quantity
-      
-                      }
-      
-                    };
-                    url = 'http://localhost:4000/MLHuergo/items/add';
-                    optionsPost.value = obj
-                    fetch(url, optionsPost)
-                      .then(res => console.log(res.data));
-                    return obj;
+                            var obj = {
 
-                  }
+                            "_itemId": item.id,
+                            "_name": item.title,
+                            "_seller": username,
+                            "_following": false,
+                            "_data": {
+            
+                                "price": item.price,
+                                "currency": item.currency_id,
+                                "availableQuantity": item.available_quantity,
+                                "soldQuantity": item.sold_quantity
+            
+                            }
+            
+                            };
+                            url = 'http://localhost:4000/MLHuergo/items/add';
+                            fetch(url, {
+                                method: 'POST',
+                                body: JSON.stringify(obj),
+                                headers:{
+                                    'Content-Type': 'application/json',
+                                }
+                            })
+                            .then(function(res){ 
+                                res.json().then(function(response){
+                                console.log(response)
+                                }
+                            )})
+                            return obj;
 
-                })
-              
+                        }
+
+                    })
+
+                .catch(function(error) {
+                    console.log('Fetch Error:', error);
+                  });
+
+                });
+
             })
 
           })
@@ -200,21 +266,7 @@ routes.route('/items/searchItems/:username').get(function(req, res) {
 
 });
 
-routes.route('/items/searchItemId/:id').get(function(req, res) {
-
-    let id = req.params.id;
-    Item.find().byItemId(id).exec(function(err, item) {
-
-        if(err)
-            console.log(err)
-        else
-            res.json(item);
-
-    });
-
-});
-
-routes.route('/items/searchSeller/:seller').get(function(req, res) {
+app.get('/MLHuergo/items/searchSeller/:seller', function(req, res) {
 
     let seller = req.params.seller;
     Item.find().bySeller(seller).exec(function(err, item) {

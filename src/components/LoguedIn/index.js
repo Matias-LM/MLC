@@ -2,19 +2,18 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-//import { Accordion, AccordionItem } from 'react-light-accordion';
 import 'react-light-accordion/demo/css/index.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 //import { objectExpression } from '@babel/types';
-//import { parse } from 'query-string';
+import { parse } from 'query-string';
 
 
 //var url = 'https://api.mercadolibre.com/oauth/token?';
 var url = 'https://api.mercadolibre.com/sites/MLA/search?';
 
-var options = {
+/*var options = {
 
-  /*form: {
+  form: {
 
     "grant_type":"authorization_code",
     "client_id": '1928415112086289',
@@ -29,7 +28,7 @@ var options = {
     'Content-Type': 'application/x-www-form-urlencoded',
     'Accept': 'application/json' 
 
-  }*/
+  }
   method: "GET",
   headers: {
 
@@ -38,7 +37,7 @@ var options = {
 
   }
 
-};
+};*/
   
 function startFollowing(id, item){
 
@@ -77,9 +76,40 @@ class LoguedIn extends Component {
       items: [],
 
     };
-    //this.state.products = {}
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  componentWillMount(){
+
+    const URLSearchParams = window.URLSearchParams;
+    var burl = new URLSearchParams();
+
+    burl.append("grant_type","authorization_code")
+    burl.append("client_id", '1928415112086289')
+    burl.append("client_secret", 'QOAOPJRyiMQgtW0HjF86OYS6Ky6fYR0a',)
+    burl.append("code",parse(this.props.location.search).code);
+    burl.append("redirect_uri","http://localhost:3000/logued_in")
+
+    var aurl = url + burl
+
+    fetch('http://localhost:4000/token', {
+      method: 'POST',
+      body: JSON.stringify({
+        "url": aurl
+      }),
+      headers:{
+        'Content-Type': 'application/json',
+      }
+    })
+    .then(function(response){ 
+      return response.text()
+        .then(function(data) {
+          localStorage.setItem('token', data);
+          console.log(data)
+        })
+    });
+
   }
 
   componentDidMount(){    
@@ -96,12 +126,6 @@ class LoguedIn extends Component {
 
   itemList() {
 
-    /*const Store = [];
-    var algo = localStorage.getItem('user');*/
-    /*for(var i = 0; i < this.state.items.length; i++){
-      Store.push(<Item item={JSON.stringify(algo[i])} key={i} />);
-    }
-    return Store;*/
     return this.state.items.map(function(citem, i){
         return <Item item={citem} key={i} />;
     })
@@ -110,11 +134,6 @@ class LoguedIn extends Component {
 
   render() {
 
-    //var algo = localStorage.getItem('user');
-    //<Accordion atomic={true} title={this.state.products}/>
-    /*<button onClick={() => this.handleFollow()}>
-        Seguir
-      </button>*/
     return (
 
       <div className="LoguedIn">
@@ -174,7 +193,7 @@ class LoguedIn extends Component {
     var username = this.state.text;
     localStorage.setItem('seller', username)
     axios.get('http://localhost:4000/MLHuergo/items/searchItems/' + username)
-      .then(window.location.reload());
+      .then();
 
   }
 
