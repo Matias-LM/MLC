@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-let CatTend = new Schema({
+let CatTime = new Schema({
 
     _name: {
         type: String
@@ -15,12 +15,12 @@ let CatTend = new Schema({
 
 });
 
-CatTend.query.byName = function(name){
+CatTime.query.byName = function(name){
     return this.find({ _name: new RegExp(name, 'i')});
 }
 
-CatTend.query.byDay = function(day){
+CatTime.query.byDay = function(day){
     return this.find({ _day: new RegExp(day, 'i')});
 }
 
-module.exports = mongoose.model('CatTend', CatTend);
+module.exports = mongoose.model('CatTime', CatTime);

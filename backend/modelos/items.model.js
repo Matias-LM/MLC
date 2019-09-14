@@ -14,6 +14,9 @@ let Item = new Schema({
     _following: { 
         type: Boolean 
     },
+    _lastUpdate: {
+        type: String
+    },
     _data: {
         type: {}
     },

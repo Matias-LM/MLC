@@ -49,16 +49,11 @@ class FollowingItems extends Component {
       
     componentDidMount(){    
 
-        axios.get('http://localhost:4000/MLitems/getFollowed')
+        axios.get('http://localhost:4000/MLHuergo/items/getFollowed')
             .then(res => {
 
-                if(!isEmptyObject(res.data)){ 
-
+                if(!isEmptyObject(res.data))
                     this.setState({ items: res.data });
-                    this.setState({ empty: false });
-
-                }else
-                    this.setState({ empty: true });
 
             })
             .catch(function (err){
@@ -69,13 +64,8 @@ class FollowingItems extends Component {
 
     itemList() {
 
-        /*const Store = [];
-        var algo = localStorage.getItem('user');*/
-        /*for(var i = 0; i < this.state.items.length; i++){
-          Store.push(<Item item={JSON.stringify(algo[i])} key={i} />);
-        }
-        return Store;*/
         return this.state.items.map(function(citem, i){
+            axios.get()//Conseguir la fecha de la ultima actualizacion
             return <Item item={citem} key={i} />;
         })
     

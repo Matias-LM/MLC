@@ -36,13 +36,14 @@ let Item = require('./modelos/items.model'); //Productos
 let FollSell = require('./modelos/following.model'); //Vendedores seguidos
 let CatSell = require('./modelos/categorySellers.model'); //Cantidad de vendedores por categoria
 let CatTend = require('./modelos/categoryTendency.model'); //Tendencias en el tiempo para categorias
+let CatTime = require('./modelos/competencyCatTime.model'); //Tendencias en el tiempo para categorias de otro vendedor
 
 //Conecto las bases
 app.use(cors()); 
 app.use(bodyParser.json());
 app.use('/MLHuergo', routes); //route.routes('/algo').get(function()); = app.get('MLHuergo/algo', function());
 
-mongoose.connect('mongodb://127.0.0.1:27017/MLHuergo', { useNewUrlParser: true });
+mongoose.connect('mongodb://157.92.32.246:27017/MLHuergo', { useNewUrlParser: true });
 const connection = mongoose.connection;
 console.clear();
 
@@ -93,7 +94,6 @@ routes.route('/items/add').post(function(req, res) {
         .then(item => {
 
             res.status(200).json({'item': 'item added successfully'});
-            console.log(item);
             
         })
         .catch(err => {
@@ -166,11 +166,7 @@ routes.route('/items/searchItemId/:id').get(function(req, res) {
 routes.route('/items/searchItems/:username').get(function(req, res) {
 
     let username = req.params.username;
-    //const URLSearchParams = window.URLSearchParams;
     var url = 'https://api.mercadolibre.com/sites/MLA/search?nickname=' + username;
-    /*var burl = new URLSearchParams();
-    burl.append("nickname", username);
-    var aurl = url + burl;*/
     var options = {
 
         method: "GET",
@@ -204,7 +200,6 @@ routes.route('/items/searchItems/:username').get(function(req, res) {
             items.results.map(function(item){
               
               url = 'http://localhost:4000/MLHuergo/items/searchItemId/' + item.id
-              //axios.get('http://localhost:4000/MLHuergo/items/searchItemId/' + item.id)
               fetch(url,options)
                 .then(function(resp){
                     resp.json().then(function(res){
@@ -432,8 +427,8 @@ routes.route('/CatSell').get(function(req, res) {
 
 routes.route('/CatSell/add').post(function(req, res) {
 
-    let CatSell = new CatSell(req.body);
-    CatSell.save()
+    let catSell = new CatSell(req.body);
+    catSell.save()
         .then(item => {
 
             res.status(200).json({'ofsel': 'item added successfully'});
@@ -500,8 +495,8 @@ routes.route('/CatTend').get(function(req, res) {
 
 routes.route('/CatTend/add').post(function(req, res) {
 
-    let CatTend = new CatTend(req.body);
-    CatTend.save()
+    let catTend = new CatTend(req.body);
+    catTend.save()
         .then(item => {
 
             res.status(200).json({'ofsel': 'item added successfully'});
@@ -535,9 +530,77 @@ routes.route('/CatTend/searchName/:name').get(function(req, res) {
 
 });
 
-routes.route('/CatSell/delete').post(function(req, res) {
+routes.route('/CatTend/delete').post(function(req, res) {
 
-    OfSel.deleteMany({_id: "5d1506238069d42b5837cdd1"}, function(err) {
+    CatTend.deleteMany({_id: "5d1506238069d42b5837cdd1"}, function(err) {
+
+        if(err) console.log(err);
+        res.json({item: "Eliminado con exito"});
+
+    });
+
+});
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////Funciones de las vendedores X categorias/////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+routes.route('/CatTime').get(function(req, res) {
+
+    CatTime.find(function(err, item) {
+
+        if (err){ 
+
+            console.log(err);
+            return 0;
+
+        }else
+            res.json(item);
+
+    });
+
+});
+
+routes.route('/CatTime/add').post(function(req, res) {
+
+    let catTime = new CatTime(req.body);
+    catTime.save()
+        .then(item => {
+
+            res.status(200).json({'ofsel': 'item added successfully'});
+
+        })
+        .catch(err => {
+
+            res.status(400).send('adding new item failed');
+
+        });
+
+});
+
+routes.route('/CatTime/searchName/:name').get(function(req, res) {
+
+    let name = req.params.name;
+    CatTime.find().byName(name).exec(function(err, item) {
+
+        if(err)
+            console.log(err)
+        else{
+
+            if(isEmptyObject(item))
+                res.json({error: 'Nonexistent item.'})
+            else
+                res.json(item);
+                
+        }
+
+    });
+
+});
+
+routes.route('/CatTime/delete').post(function(req, res) {
+
+    CatTime.deleteMany({_id: "5d1506238069d42b5837cdd1"}, function(err) {
 
         if(err) console.log(err);
         res.json({item: "Eliminado con exito"});
