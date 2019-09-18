@@ -58,7 +58,7 @@ app.listen(PORT, function() {
 app.post('/token',function(req,rest){
     var url = req.body.url;
     request.post({url: url, json:true, options},function(req,res,body){
-        token = body
+        token = body.access_token
         rest.send(token)
     })
 })
