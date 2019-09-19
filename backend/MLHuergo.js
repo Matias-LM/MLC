@@ -63,6 +63,104 @@ app.post('/token',function(req,rest){
     })
 })
 
+app.get('/items/searchItems/:username', function(req, res) {
+
+    let username = req.params.username;
+    var url = 'https://api.mercadolibre.com/sites/MLA/search?nickname=' + username + '&offset=50';
+    var options = {
+
+        method: "GET",
+        headers: {
+      
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json' 
+      
+        }
+      
+      };
+    var optionsPost = {
+
+        method: "POST",
+        body: [],
+        headers: {
+      
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json' 
+      
+        }
+      
+      };
+    fetch(url,options)
+      .then(function(response){ 
+
+        response.json()
+          .then(function(data) {
+            
+            var items = data;
+            items.results.map(function(item){
+              
+              url = 'http://localhost:4000/MLHuergo/items/searchItemId/' + item.id
+              fetch(url,options)
+                .then(function(resp){
+                    resp.json().then(function(res){
+
+                        console.log(res);
+                        if(!isEmptyObject(res)) 
+                            return;
+                        else{
+
+                            var obj = {
+
+                            "_itemId": item.id,
+                            "_name": item.title,
+                            "_seller": username,
+                            "_following": false,
+                            "_data": {
+            
+                                "price": item.price,
+                                "currency": item.currency_id,
+                                "availableQuantity": item.available_quantity,
+                                "soldQuantity": item.sold_quantity
+            
+                            }
+            
+                            };
+                            url = 'http://localhost:4000/MLHuergo/items/add';
+                            fetch(url, {
+                                method: 'POST',
+                                body: JSON.stringify(obj),
+                                headers:{
+                                    'Content-Type': 'application/json',
+                                }
+                            })
+                            .then(function(res){ 
+                                res.json().then(function(response){
+                                console.log(response)
+                                }
+                            )})
+                            return obj;
+
+                        }
+
+                    })
+
+                .catch(function(error) {
+                    console.log('Fetch Error:', error);
+                  });
+
+                });
+
+            })
+
+          })
+          .catch(function(error) {
+            console.log('Fetch Error:', error);
+          });
+
+    });
+
+});
+
 function isEmptyObject(obj){
     return !Object.keys(obj).length;
   }
@@ -163,105 +261,7 @@ routes.route('/items/searchItemId/:id').get(function(req, res) {
 
 });
 
-routes.route('/items/searchItems/:username').get(function(req, res) {
-
-    let username = req.params.username;
-    var url = 'https://api.mercadolibre.com/sites/MLA/search?nickname=' + username;
-    var options = {
-
-        method: "GET",
-        headers: {
-      
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json' 
-      
-        }
-      
-      };
-    var optionsPost = {
-
-        method: "POST",
-        body: [],
-        headers: {
-      
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json' 
-      
-        }
-      
-      };
-    fetch(url,options)
-      .then(function(response){ 
-
-        response.json()
-          .then(function(data) {
-            
-            var items = data;
-            items.results.map(function(item){
-              
-              url = 'http://localhost:4000/MLHuergo/items/searchItemId/' + item.id
-              fetch(url,options)
-                .then(function(resp){
-                    resp.json().then(function(res){
-
-                        console.log(res);
-                        if(!isEmptyObject(res)) 
-                            return;
-                        else{
-
-                            var obj = {
-
-                            "_itemId": item.id,
-                            "_name": item.title,
-                            "_seller": username,
-                            "_following": false,
-                            "_data": {
-            
-                                "price": item.price,
-                                "currency": item.currency_id,
-                                "availableQuantity": item.available_quantity,
-                                "soldQuantity": item.sold_quantity
-            
-                            }
-            
-                            };
-                            url = 'http://localhost:4000/MLHuergo/items/add';
-                            fetch(url, {
-                                method: 'POST',
-                                body: JSON.stringify(obj),
-                                headers:{
-                                    'Content-Type': 'application/json',
-                                }
-                            })
-                            .then(function(res){ 
-                                res.json().then(function(response){
-                                console.log(response)
-                                }
-                            )})
-                            return obj;
-
-                        }
-
-                    })
-
-                .catch(function(error) {
-                    console.log('Fetch Error:', error);
-                  });
-
-                });
-
-            })
-
-          })
-          .catch(function(error) {
-            console.log('Fetch Error:', error);
-          });
-
-    });
-
-});
-
-app.get('/MLHuergo/items/searchSeller/:seller', function(req, res) {
+routes.route('/items/searchSeller/:seller').get(function(req, res) {
 
     let seller = req.params.seller;
     Item.find().bySeller(seller).exec(function(err, item) {

@@ -16,11 +16,11 @@ let CatTend = new Schema({
 });
 
 CatTend.query.byName = function(name){
-    return this.find({ _name: new RegExp(name, 'i')});
+    return this.find({ _name: name});
 }
 
 CatTend.query.byDay = function(day){
-    return this.find({ _day: new RegExp(day, 'i')});
+    return this.find({ _day: day});
 }
 
 module.exports = mongoose.model('CatTend', CatTend);

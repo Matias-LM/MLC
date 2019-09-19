@@ -8,7 +8,7 @@ let FollSell = new Schema({
 });
 
 FollSell.query.byName = function(name){
-    return this.find({ _name: new RegExp(name, 'i')});
+    return this.find({ _name: name});
 }
 
 module.exports = mongoose.model('FollSell', FollSell);

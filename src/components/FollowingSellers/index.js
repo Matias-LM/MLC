@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Accordion, AccordionItem } from 'react-light-accordion';
 import axios from 'axios';
-//import Accordion from 'react-bootstrap/Accordion'
 import Card from 'react-bootstrap/Card'
 import "bootstrap/dist/css/bootstrap.min.css";
 

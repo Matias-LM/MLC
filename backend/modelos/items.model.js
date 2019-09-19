@@ -23,15 +23,15 @@ let Item = new Schema({
 });
 
 Item.query.byItemId = function(id){
-    return this.find({ _itemId: new RegExp(id)});
+    return this.find({ _itemId: id});
 }
 
 Item.query.byName = function(name){
-    return this.find({ _name: new RegExp(name, 'i')});
+    return this.find({ _name: name});
 }
 
 Item.query.bySeller = function(seller){
-    return this.find({ _seller: new RegExp(seller, 'g')});
+    return this.find({ _seller: seller});
 }
 
 Item.query.byFoll = function(){

@@ -16,11 +16,11 @@ let CatTime = new Schema({
 });
 
 CatTime.query.byName = function(name){
-    return this.find({ _name: new RegExp(name, 'i')});
+    return this.find({ _name: name});
 }
 
 CatTime.query.byDay = function(day){
-    return this.find({ _day: new RegExp(day, 'i')});
+    return this.find({ _day: day});
 }
 
 module.exports = mongoose.model('CatTime', CatTime);

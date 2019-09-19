@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import 'react-light-accordion/demo/css/index.css';
 import "bootstrap/dist/css/bootstrap.min.css";
-//import { objectExpression } from '@babel/types';
 import { parse } from 'query-string';
 
 
@@ -116,6 +115,7 @@ class LoguedIn extends Component {
 
     axios.get('http://localhost:4000/MLHuergo/items/searchSeller/' + localStorage.getItem('seller'))
       .then(res => {
+        console.log(res);
         if(!isEmptyObject(res.data)) this.setState({ items: res.data });
       })
       .catch(function (err){
@@ -192,8 +192,8 @@ class LoguedIn extends Component {
     }
     var username = this.state.text;
     localStorage.setItem('seller', username)
-    axios.get('http://localhost:4000/MLHuergo/items/searchItems/' + username)
-      .then();
+    axios.get('http://localhost:4000/items/searchItems/' + username)
+      .then(window.location.reload());
 
   }
 
@@ -202,8 +202,8 @@ class LoguedIn extends Component {
     if (!this.state.text.length) {
       return;
     }
-    axios.post('http://localhost:4002/MLfollowing/add', {_name: this.state.text})
-      .then(function(res){window.location.reload();});
+    axios.post('http://localhost:4000/MLfollowing/add', {_name: this.state.text})
+      .then(function(){window.location.reload();});
 
   }
 
