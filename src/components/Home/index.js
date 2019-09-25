@@ -17,8 +17,7 @@ class Home extends Component {
             href="https://auth.mercadolibre.com/authorization?client_id=1928415112086289&response_type=code&state=5ca75bd30"
             >
               here 
-            </a> 
-             to get the token.
+            </a> to get the token.
 
           </p>
 

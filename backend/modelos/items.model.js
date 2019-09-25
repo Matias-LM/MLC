@@ -8,6 +8,9 @@ let Item = new Schema({
     _name: {
         type: String
     },
+    _link:{
+        type: String
+    },
     _seller: {
         type: String
     },
