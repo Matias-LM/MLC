@@ -6,14 +6,14 @@ import 'react-light-accordion/demo/css/index.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { parse } from 'query-string';
 
-
+var follSeller = false;
 var url = 'https://api.mercadolibre.com/oauth/token?';
-  
+var token;
 function startFollowing(item, token){
 
-  console.log(item);
+  var sell = false;
   item = JSON.stringify(item);
-  axios.post('http://localhost:4000/items/startFollowing', {item, token})
+  axios.post('http://localhost:4000/items/startFollowing', {item, token, sell})
     .then(function(data){
       //this.props.history.push('/FollowingItems');
   });
@@ -50,6 +50,7 @@ class LoguedIn extends Component {
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleFollow = this.handleFollow.bind(this);
   }
 
   componentWillMount(){
@@ -80,10 +81,12 @@ class LoguedIn extends Component {
         }
 
       }).then(function(response){ 
-
+        console.log('token');
           return response.text()
             .then(function(data) {
+              console.log('token');
               console.log(data);
+              console.log('token');
               localStorage.setItem('token', data);
               localStorage.setItem('ask', true)
             })
@@ -133,6 +136,11 @@ class LoguedIn extends Component {
             Buscar 
           </button>
         </form>
+        <form onSubmit={this.handleFollow}>
+          <button>
+            Buscar y seguir
+          </button>
+          </form>
         <table className="table table-striped" style={{ marginTop: 20 }}>
 
           <thead>
@@ -181,12 +189,13 @@ class LoguedIn extends Component {
 
   }
 
-  handleFollow(){
+  handleFollow(e){
 
+    e.preventDefault();
     if (!this.state.text.length) {
       return;
     }
-    axios.post('http://localhost:4000/MLfollowing/add', {_name: this.state.text})
+    axios.post('http://localhost:4000/MLHuergo/FollSell/add', {_name: this.state.text})
       .then(function(){window.location.reload();});
 
   }

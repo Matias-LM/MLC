@@ -13,6 +13,7 @@ const PORT = 4000;
 
 //Aca importo los modelos para los jsons a guardar
 let Item = require('./modelos/items.model'); //Productos
+let Change = require('./modelos/changes.model'); //Productos
 let FollSell = require('./modelos/following.model'); //Vendedores seguidos
 let CatSell = require('./modelos/categorySellers.model'); //Cantidad de vendedores por categoria
 let CatTend = require('./modelos/categoryTendency.model'); //Tendencias en el tiempo para categorias
@@ -22,6 +23,15 @@ let CatTime = require('./modelos/competencyCatTime.model'); //Tendencias en el t
 app.use(cors()); 
 app.use(bodyParser.json());
 app.use('/MLHuergo', routes); //route.routes('/algo').get(function()); = app.get('MLHuergo/algo', function());
+var corsMiddleware = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', 'localhost'); //replace localhost with actual host
+    res.header('Access-Control-Allow-Methods', 'OPTIONS, GET, PUT, PATCH, POST, DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, Authorization');
+
+    next();
+}
+app.use(corsMiddleware);
+var url;
 
 mongoose.connect('mongodb://157.92.32.246:27017/MLHuergo', { useNewUrlParser: true });
 const connection = mongoose.connection;
@@ -71,6 +81,7 @@ app.post('/token',function(req,rest){
     request.post({url: url, json:true, options},function(req,res,body){
         
         token = body.access_token
+        console.log(token);
         rest.send(token)
 
     })
@@ -92,6 +103,7 @@ app.get('/items/searchItems/:username', function(req, res) {
         }
       
       };
+    
     fetch(url,options)
       .then(function(response){ 
 
@@ -138,7 +150,8 @@ app.get('/items/searchItems/:username', function(req, res) {
                             })
                             .then(function(res){ 
                                 res.json().then(function(response){
-                                console.log(response)
+                                console.log(response);
+                                res.status(200).json(response)
                                 }
                             )})
                             return obj;
@@ -169,7 +182,9 @@ app.post('/items/startFollowing',function(req,rest){
     var item = req.body.item;
     item = JSON.parse(item);
     var id = item._itemId;
-    var token = req.body.token;
+    //var token = req.body.token;
+    console.log(token);
+    var follsell = req.body.sell;
     var url = 'https://api.mercadolibre.com/items?ids=' + id + '&access_token=' + token;
     var options = {
 
@@ -182,13 +197,14 @@ app.post('/items/startFollowing',function(req,rest){
         }
       
     };
-    item._following = true;
+    if(!follsell) item._following = true;
     fetch(url,options)
       .then(function(response){ 
 
         response.json()
           .then(function(data) {
 
+            console.log(data);
             var res = data;
             res.map(function(aux){
                 item._lastUpdate = aux.body.last_updated;
@@ -273,7 +289,6 @@ routes.route('/items/searchId/:id').get(function(req, res) {
 
 routes.route('/items/update').post(function(req, res) {
 
-    console.log(req.body);
     let id = req.body._itemId;
     Item.updateOne({_itemId: id}, {
         
@@ -355,6 +370,99 @@ routes.route('/items/getFollowed').get(function(req, res) {
 
 });
 
+routes.route('/items/getChanges').post(function(req, res) {
+
+    var citem = req.body.citem;
+    citem = JSON.parse(citem);
+    var id = citem._itemId;
+    Item.find().byItemId(id).exec(function(err, item) {
+
+        if(err)
+            res.status(400).json(err)
+        else{
+
+            item = item[0];
+            if(item._lastUpdate != citem._lastUpdate){
+
+                var aux = {
+                    "_itemId": citem._itemId,
+                    "_field": "",
+                    "_prevValue": "",
+                    "_nextValue": ""
+                }
+                if(item._name != citem._name){
+
+                    aux._field = "Nombre";
+                    aux._prevValue = item._name;
+                    aux._nextValue = citem._name;
+
+                }
+                if(item._data.price != citem._data.price){
+                    
+                    aux._field = "Precio";
+                    aux._prevValue = item._data.price;
+                    aux._nextValue = citem._data.price;
+
+                }
+                if(item._data.currency != citem._data.currency){
+
+                    aux._field = "Moneda";
+                    aux._prevValue = item._data.currency;
+                    aux._nextValue = citem._data.currency;
+
+                }
+                if(item._data.availableQuantity != citem._data.availableQuantity){
+                    
+                    aux._field = "Cantidad disponible";
+                    aux._prevValue = item._data.availableQuantity;
+                    aux._nextValue = citem._data.availableQuantity;
+
+                }
+                if(item._data.soldQuantity != citem._data.soldQuantity){
+                    
+                    aux._field = "Cantidad vendida";
+                    aux._prevValue = item._data.soldQuantity;
+                    aux._nextValue = citem._data.soldQuantity;
+
+                }
+                url = 'http://localhost:4000/MLHuergo/changes/add';
+                fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify(aux),
+                    headers:{
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(function(res){ 
+                    res.json().then(function(response){
+
+                        console.log(response);
+                        url = 'http://localhost:4000/MLHuergo/items/update';
+                        fetch(url, {
+
+                            method: 'POST',
+                            body: JSON.stringify(citem),
+                            headers:{
+                                'Content-Type': 'application/json',
+                            }
+
+                        }).then(function(res){ 
+
+                            rest.status(200).json({'message': "Item modificado exitosamente."});
+
+                            })
+                        }
+
+                )})
+
+            }else res.status(200).json(item);
+
+        }
+
+    });
+
+});
+
 routes.route('/items/delete/:seller').post(function(req, res) {
 
     let seller = req.params.seller;
@@ -366,6 +474,54 @@ routes.route('/items/delete/:seller').post(function(req, res) {
     });
 
 });
+
+routes.route('/changes').get(function(req, res) {
+
+    Change.find(function(err, item) {
+
+        if (err){ 
+
+            res.status(400).json(err);
+            return 0;
+
+        }else
+            res.status(200).json(item);
+
+    });
+
+});
+
+routes.route('/changes/:id').get(function(req, res) {
+
+    let id = req.params.id;
+    Change.find().byItemId(id).exec(function(err, item) {
+
+        if(err)
+            console.log(err)
+        else
+            res.status(200).json(item);
+
+    });
+
+});
+
+routes.route('/changes/add').post(function(req, res) {
+
+    let changes = new Change(req.body);
+    changes.save()
+        .then(item => {
+
+            res.status(200).json({'Change': 'Change registered successfully'});
+
+        })
+        .catch(err => {
+
+            res.status(400).send('Adding new item failed');
+
+        });
+
+});
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////Funciones de los vendedores seguidos////////////////////////////////////
@@ -389,11 +545,68 @@ routes.route('/FollSell').get(function(req, res) {
 
 routes.route('/FollSell/add').post(function(req, res) {
 
-    let FollSell = new FollSell(req.body);
-    ofsel.save()
+    var options = {
+
+        method: "GET",
+        headers: {
+        
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/json' 
+        
+        }
+        
+    }
+    url = 'http://localhost:4000/MLHuergo/FollSell/searchName' + req.body._name;
+    fetch(url, options)
+     .then(res =>{
+        if(!isEmptyObject(res.data)) return;
+     })
+
+    let follSell = new FollSell(req.body);
+    follSell.save()
         .then(item => {
 
-            res.status(200).json({'ofsel': 'item added successfully'});
+            url = 'http://localhost:4000/MLHuergo/items/searchSeller/' + item._name;
+            fetch(url, {
+
+                method: "GET",
+                headers: {
+              
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'Accept': 'application/json' 
+              
+                }
+              
+              })
+            .then(res => {
+
+                console.log(res);
+                if(!isEmptyObject(res.data || [])){
+
+                    res.data.map(function(item){
+
+                        url = 'http://localhost:4000/MLHuergo/items/startFollowing';
+
+                        fetch(url, {
+
+                            method: 'POST',
+                            body: JSON.stringify(item),
+                            headers:{
+                                'Content-Type': 'application/json',
+                            }
+
+                        }).then(function(res){ 
+
+                            rest.status(200).json({'message': "Item seguido exitosamente."});
+
+                        })
+
+                    })
+
+                }
+
+            });
+            //res.status(200).json({'ofsel': 'item added successfully'});
 
         })
         .catch(err => {
@@ -407,7 +620,7 @@ routes.route('/FollSell/add').post(function(req, res) {
 routes.route('/FollSell/searchId/:id').get(function(req, res) {
 
     let id = req.params.id;
-    OfSel.findById(id, function(err, item) {
+    FollSell.findById(id, function(err, item) {
 
         if(err)
             res.status(400).json(err)
@@ -445,7 +658,7 @@ routes.route('/FollSell/update/:id').post(function(req, res) {
 routes.route('/FollSell/searchName/:name').get(function(req, res) {
 
     let name = req.params.name;
-    OfSel.find().byName(name).exec(function(err, item) {
+    FollSell.find().byName(name).exec(function(err, item) {
 
         if(err)
             console.status(400).log(err)
@@ -462,9 +675,10 @@ routes.route('/FollSell/searchName/:name').get(function(req, res) {
 
 });
 
-routes.route('/FollSell/delete').post(function(req, res) {
+routes.route('/FollSell/delete/:name').post(function(req, res) {
 
-    OfSel.deleteMany({_id: "5d1506238069d42b5837cdd1"}, function(err) {
+    var name = req.params.name
+    FollSell.deleteMany({_name: name}, function(err) {
 
         if(err) console.log(err);
         res.status(200).json({item: "Eliminado con exito"});
