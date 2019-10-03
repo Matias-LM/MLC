@@ -9,6 +9,7 @@ import LoguedIn from './components/LoguedIn';
 import FollowingItems from './components/FollowingItems';
 import FollowingSellers from './components/FollowingSellers';
 import Page404 from './components/Page404';
+import Ventas from './components/Ventas';
 
 const AppRoutes = () =>
     <App>
@@ -19,6 +20,7 @@ const AppRoutes = () =>
             <Route exact path="/logued_in" component={LoguedIn} />
             <Route exact path="/FollowingItems" component={FollowingItems} />
             <Route exact path="/FollowingSellers" component={FollowingSellers} />
+            <Route exact path="/Ventas" component={Ventas} />
             <Route component={Page404} />
 
         </Switch>

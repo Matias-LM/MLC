@@ -9,7 +9,8 @@ const mongoose = require('mongoose');
 const request = require('request');
 const PORT = 4000;
 
-//var token; //En donde quedara guardado el access token
+var el_token_completo
+var token; //En donde quedara guardado el access token
 
 //Aca importo los modelos para los jsons a guardar
 let Item = require('./modelos/items.model'); //Productos
@@ -79,7 +80,7 @@ app.post('/token',function(req,rest){
     };
     var url = req.body.url;
     request.post({url: url, json:true, options},function(req,res,body){
-        
+        el_token_completo = body
         token = body.access_token
         console.log(token);
         rest.send(token)
@@ -239,6 +240,19 @@ app.post('/items/startFollowing',function(req,rest){
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////Funciones de los productos/////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+app.get('/ventasEnOrden',function(req,res){
+    console.log("Entró");
+    var fecha = new Date();
+    var fechaactual = fecha.getUTCFullYear();
+    var murl = "https://api.mercadolibre.com/orders/search?seller="+ el_token_completo.user_id +"&order.date_created.from=2015-07-01T00:00:00.000-00:00&order.date_created.to="+ fechaactual +"-07-31T00:00:00.000-00:00&access_token="+el_token_completo.access_token;
+    request.get({url: murl}, function (error, response, body) {
+        var orders = JSON.parse(body);
+        console.log(orders)
+        res.send(orders)
+    })
+})
+
 
 routes.route('/items').get(function(req, res) {
 
