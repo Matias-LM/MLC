@@ -66,7 +66,7 @@ class LoguedIn extends Component {
 
     var ask = localStorage.getItem('ask')
     console.log(ask);
-    if (!ask) {
+    //if (!ask) {
 
       const URLSearchParams = window.URLSearchParams;
       var burl = new URLSearchParams();
@@ -100,7 +100,7 @@ class LoguedIn extends Component {
 
       });
 
-    }
+    //}
 
   }
 
