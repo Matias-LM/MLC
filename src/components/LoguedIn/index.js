@@ -13,7 +13,7 @@ function startFollowing(item, token){
 
   var sell = false;
   item = JSON.stringify(item);
-  axios.post('http://localhost:4000/items/startFollowing', {item, token, sell})
+  axios.post('http://localhost:4000/items/startFollowing', {item, sell})
     .then(function(data){
       //this.props.history.push('/FollowingItems');
   });

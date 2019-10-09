@@ -9,7 +9,7 @@ const mongoose = require('mongoose');
 const request = require('request');
 const PORT = 4000;
 
-//var token; //En donde quedara guardado el access token
+var token; //En donde quedara guardado el access token
 
 //Aca importo los modelos para los jsons a guardar
 let Item = require('./modelos/items.model'); //Productos
@@ -150,7 +150,6 @@ app.get('/items/searchItems/:username', function(req, res) {
                             })
                             .then(function(res){ 
                                 res.json().then(function(response){
-                                console.log(response);
                                 res.status(200).json(response)
                                 }
                             )})
@@ -182,7 +181,6 @@ app.post('/items/startFollowing',function(req,rest){
     var item = req.body.item;
     item = JSON.parse(item);
     var id = item._itemId;
-    //var token = req.body.token;
     console.log(token);
     var follsell = req.body.sell;
     var url = 'https://api.mercadolibre.com/items?ids=' + id + '&access_token=' + token;
@@ -556,64 +554,58 @@ routes.route('/FollSell/add').post(function(req, res) {
         }
         
     }
-    url = 'http://localhost:4000/MLHuergo/FollSell/searchName' + req.body._name;
+    url = 'http://localhost:4000/MLHuergo/FollSell/searchName/' + req.body._name;
     fetch(url, options)
-     .then(res =>{
-        if(!isEmptyObject(res.data)) return;
-     })
+     .then(resp =>{
+         console.log(resp);
+        if(resp.size != 0) return;
+        let follSell = new FollSell(req.body);
+        follSell.save()
+            .then(item => {
 
-    let follSell = new FollSell(req.body);
-    follSell.save()
-        .then(item => {
+                Item.find().bySeller(item._name).exec(function(err, response){
 
-            url = 'http://localhost:4000/MLHuergo/items/searchSeller/' + item._name;
-            fetch(url, {
+                    response.map(function(prod){
 
-                method: "GET",
-                headers: {
-              
-                  'Content-Type': 'application/x-www-form-urlencoded',
-                  'Accept': 'application/json' 
-              
-                }
-              
-              })
-            .then(res => {
-
-                console.log(res);
-                if(!isEmptyObject(res.data || [])){
-
-                    res.data.map(function(item){
-
+                        var body = {item: JSON.stringify(prod), sell: true};
                         url = 'http://localhost:4000/MLHuergo/items/startFollowing';
-
                         fetch(url, {
 
                             method: 'POST',
-                            body: JSON.stringify(item),
+                            body: body,
                             headers:{
                                 'Content-Type': 'application/json',
                             }
 
-                        }).then(function(res){ 
+                        }).then(res=>{})
+                        .catch(function(res){console.log(res)})});
 
-                            rest.status(200).json({'message': "Item seguido exitosamente."});
+                })
+                .then(function(resp){ 
 
-                        })
+                    resp.status(200).json({'message': "Usuario seguido exitosamente."});
 
-                    })
+                })
+                .catch(err => {
 
-                }
+                    res.status(400).send('adding new item failed');
+        
+                });
+                //res.status(200).json({'ofsel': 'item added successfully'});
+
+            })
+            .catch(err => {
+
+                res.status(400).send('adding new item failed');
 
             });
-            //res.status(200).json({'ofsel': 'item added successfully'});
+        })        
 
-        })
-        .catch(err => {
+     .catch(err => {
 
-            res.status(400).send('adding new item failed');
+        res.status(400).send('adding new item failed');
 
-        });
+     });
 
 });
 
@@ -661,13 +653,9 @@ routes.route('/FollSell/searchName/:name').get(function(req, res) {
     FollSell.find().byName(name).exec(function(err, item) {
 
         if(err)
-            console.status(400).log(err)
+            res.status(400).log(err)
         else{
-
-            if(isEmptyObject(item))
-                res.status(404).json({error: 'Nonexistent item.'})
-            else
-                res.status(200).json(item);
+            res.status(200).json(item);
                 
         }
 

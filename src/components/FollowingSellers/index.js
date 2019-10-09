@@ -29,7 +29,7 @@ const Item = props => (
                 </tr>
 
             </thead>  
-            <tbody> </tbody>
+            <tbody></tbody>
 
         </table>
             
