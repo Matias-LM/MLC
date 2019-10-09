@@ -14,6 +14,11 @@ export default [
         title: 'Productos Seguidos',
         url: '/FollowingItems',
 
+    },
+    {
+        title: 'Ventas',
+        url: '/Ventas',
+
     }
 
 ];
