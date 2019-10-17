@@ -242,10 +242,33 @@ app.post('/items/startFollowing',function(req,rest){
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 app.get('/ventasEnOrden',function(req,res){
+    /*console.log("Entró");
+    var fecha = new Date();
+    var fechaprime = //2015-07-01
+    //var fechaactual = fecha.getUTCFullYear();
+    var murl = "https://api.mercadolibre.com/orders/search?seller="+ el_token_completo.user_id +"&order.date_created.from=2015-07-01T00:00:00.000-00:00&order.date_created.to="+ fechaactual +"-07-31T00:00:00.000-00:00&access_token="+el_token_completo.access_token;
+    request.get({url: murl}, function (error, response, body) {
+        var orders = JSON.parse(body);
+        var ordersString = JSON.stringify(orders)
+        console.log(orders)
+        res.send(orders)
+    })*/
     console.log("Entró");
     var fecha = new Date();
+    console.log(fecha.toLocaleDateString(undefined, {
+
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+
+    }))
+    //var fechaprime = //2015-07-01
+    var year = fecha.getUTCFullYear();
+    var month = fecha.getUTCMonth();
+    var day = fecha.getUTCDay();
     var fechaactual = fecha.getUTCFullYear();
-    var murl = "https://api.mercadolibre.com/orders/search?seller="+ el_token_completo.user_id +"&order.date_created.from=2015-07-01T00:00:00.000-00:00&order.date_created.to="+ fechaactual +"-07-31T00:00:00.000-00:00&access_token="+el_token_completo.access_token;
+    var murl = "https://api.mercadolibre.com/orders/search?seller="+ el_token_completo.user_id +"&order.date_created.from=2015-07-01T00:00:00.000-00:00&order.date_created.to="+ fechaactual +"-12-31T00:00:00.000-00:00&access_token="+el_token_completo.access_token;
     request.get({url: murl}, function (error, response, body) {
         var orders = JSON.parse(body);
         var ordersString = JSON.stringify(orders)
