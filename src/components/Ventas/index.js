@@ -1,21 +1,26 @@
 import React, { Component } from 'react';
 import { Accordion, AccordionItem } from 'react-light-accordion';
 import axios from 'axios';
+import DayPickerInput from 'react-day-picker/DayPickerInput';
+
 import "bootstrap/dist/css/bootstrap.min.css";
 import 'react-light-accordion/demo/css/index.css';
+import 'react-day-picker/lib/style.css';
 
 function isEmptyObject(obj){
     return !Object.keys(obj).length;
 }
 
-function paid(speedwagon){
-    if (speedwagon = "paid"){
+function paid(speedwagon){ //Reemplaza el "paid" por "finalizado" porque esto es argentina
+    if (speedwagon == "paid"){
         return "Finalizado"
     } else{
         return "Por finalizar"
     }
 
 }
+
+
 
 function shipping(ship){
     if (ship == null) {
@@ -67,14 +72,26 @@ class Ventas extends Component {
     
           empty: true,
           items: [],
+          desde: null,
+          hasta: null
     
         };
+        this.pedirDatosABackend = this.pedirDatosABackend.bind(this);
+        this.handleDayChangeDesde = this.handleDayChangeDesde.bind(this)
+        this.handleDayChangeHasta = this.handleDayChangeHasta.bind(this)
 
     }
-      
-    componentDidMount(){    
-
-        axios.get('http://localhost:4000/ventasEnOrden')
+    
+    pedirDatosABackend() {
+        console.log(this.state.desde)
+        console.log(this.state.hasta)
+        if (!this.state.desde || !this.state.hasta) {
+            console.log('va a hacer el get')
+            axios.get('http://localhost:4000/ventasEnOrden',{
+                params: {
+                  desde: this.state.desde,
+                  hasta: this.state.hasta
+                }})
             .then(res => {
 
                 if(!isEmptyObject(res))
@@ -84,7 +101,13 @@ class Ventas extends Component {
             })
             .catch(function (err){
                 console.log(err);
-            })
+            });
+        }
+        }
+    
+    componentDidMount() {    
+
+        this.pedirDatosABackend()
 
     }
 
@@ -95,17 +118,37 @@ class Ventas extends Component {
         })
     
     }
+    
+    handleDayChangeDesde(selectedDay) {
+       console.log('handle day desde')
+       this.setState({ desde: selectedDay })
+       this.pedirDatosABackend()
+    }
 
-    render(){
+    
+    handleDayChangeHasta(selectedDay) {
+        this.setState({ hasta: selectedDay })
+        this.pedirDatosABackend()
+    }
+
+    render() {
         
         return(
-
-            <div className="FollowingItems">
+            <div>
+                    
+        <DayPickerInput onDayChange={this.handleDayChangeDesde}
                 
-                <Accordion atomic={true}>
-                    {this.itemList()}
-                </Accordion>
+        />
+        <DayPickerInput onDayChange={this.handleDayChangeHasta} format='yyyy-mm-dd'
+        />
 
+                <div className="FollowingItems">
+                    
+                    <Accordion atomic={true}>
+                        {this.itemList()}
+                    </Accordion>
+
+                </div>
             </div>
 
         );

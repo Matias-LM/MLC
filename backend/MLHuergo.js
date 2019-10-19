@@ -242,22 +242,37 @@ app.post('/items/startFollowing',function(req,rest){
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 app.get('/ventasEnOrden',function(req,res){
-    /*console.log("Entró");
+    console.log("Entró");
     var fecha = new Date();
-    var fechaprime = //2015-07-01
-    //var fechaactual = fecha.getUTCFullYear();
-    var murl = "https://api.mercadolibre.com/orders/search?seller="+ el_token_completo.user_id +"&order.date_created.from=2015-07-01T00:00:00.000-00:00&order.date_created.to="+ fechaactual +"-07-31T00:00:00.000-00:00&access_token="+el_token_completo.access_token;
+    //var fechaprime = //2015-07-01
+    var ytoday = fecha.getUTCFullYear();
+    var mtoday = fecha.getUTCMonth();
+    var dtoday = fecha.getUTCDay();
+    var hasta = ytoday + "-" + mtoday + "-" + dtoday
+    console.log(hasta)
+    var desde = "2010-01-01"
+    console.log(req.body.desde);
+    console.log(req.body.hasta);
+
+    if (req.body.hasta !== 'null'){
+        hasta = req.body.hasta
+    }
+    if (req.body.desde !== 'null'){
+        desde = req.body.desde
+    }
+
+    var murl = "https://api.mercadolibre.com/orders/search?seller="+ el_token_completo.user_id +"&order.date_created.from=" + desde + "T00:00:00.000-00:00&order.date_created.to="+ hasta +"T00:00:00.000-00:00&access_token="+el_token_completo.access_token;
     request.get({url: murl}, function (error, response, body) {
         var orders = JSON.parse(body);
-        var ordersString = JSON.stringify(orders)
-        console.log(orders)
+        //var ordersString = JSON.stringify(orders)
+        //console.log(orders)
         res.send(orders)
-    })*/
-    console.log("Entró");
+    })
+    /*console.log("Entró");
     var fecha = new Date();
     console.log(fecha.toLocaleDateString(undefined, {
 
-        weekday: 'long',
+        weekday: 'long',    
         year: 'numeric',
         month: 'long',
         day: 'numeric'
@@ -274,7 +289,7 @@ app.get('/ventasEnOrden',function(req,res){
         var ordersString = JSON.stringify(orders)
         console.log(orders)
         res.send(orders)
-    })
+    })*/
 })
 
 
