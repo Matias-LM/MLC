@@ -9,7 +9,6 @@ const mongoose = require('mongoose');
 const request = require('request');
 const PORT = 4000;
 
-var el_token_completo
 var token; //En donde quedara guardado el access token
 
 //Aca importo los modelos para los jsons a guardar
@@ -81,10 +80,9 @@ app.post('/token',function(req,rest){
     var url = req.body.url;
     console.log('se va a hacer el post')
     request.post({url: url, json:true, options},function(req,res,body){
-        el_token_completo = body
-        token = body.access_token
+        token = body
         console.log('el token completo es')
-        console.log(el_token_completo);
+        console.log(token);
         rest.send(token)
 
     })
@@ -186,7 +184,7 @@ app.post('/items/startFollowing',function(req,rest){
     var id = item._itemId;
     console.log(token);
     var follsell = req.body.sell;
-    var url = 'https://api.mercadolibre.com/items?ids=' + id + '&access_token=' + token;
+    var url = 'https://api.mercadolibre.com/items?ids=' + id + '&access_token=' + token.access_token;
     var options = {
 
         method: "GET",
@@ -245,23 +243,26 @@ app.get('/ventasEnOrden',function(req,res){
     console.log("Entró");
     var fecha = new Date();
     //var fechaprime = //2015-07-01
-    var ytoday = fecha.getUTCFullYear();
-    var mtoday = fecha.getUTCMonth();
-    var dtoday = fecha.getUTCDay();
+    var ytoday = fecha.getFullYear();
+    var mtoday = fecha.getMonth();
+    var dtoday = fecha.getDate();
     var hasta = ytoday + "-" + mtoday + "-" + dtoday
     console.log(hasta)
-    var desde = "2010-01-01"
-    console.log(req.body.desde);
-    console.log(req.body.hasta);
+    var desde = "2015-01-01"
+    console.log(req);
 
-    if (req.body.hasta !== 'null'){
-        hasta = req.body.hasta
+    if (req.query.hasta != null){
+        hasta = req.query.hasta
+        hasta = hasta.substring(0,10) 
+
     }
-    if (req.body.desde !== 'null'){
-        desde = req.body.desde
+    if (req.query.desde != null){
+        desde = req.query.desde
+        desde = desde.substring(0,10) 
     }
 
-    var murl = "https://api.mercadolibre.com/orders/search?seller="+ el_token_completo.user_id +"&order.date_created.from=" + desde + "T00:00:00.000-00:00&order.date_created.to="+ hasta +"T00:00:00.000-00:00&access_token="+el_token_completo.access_token;
+    var murl = "https://api.mercadolibre.com/orders/search?seller="+ token.user_id +"&order.date_created.from=" + desde + "T00:00:00.000-00:00&order.date_created.to="+ hasta +"T00:00:00.000-00:00&access_token="+token.access_token;
+    console.log(murl)
     request.get({url: murl}, function (error, response, body) {
         var orders = JSON.parse(body);
         //var ordersString = JSON.stringify(orders)
@@ -283,7 +284,7 @@ app.get('/ventasEnOrden',function(req,res){
     var month = fecha.getUTCMonth();
     var day = fecha.getUTCDay();
     var fechaactual = fecha.getUTCFullYear();
-    var murl = "https://api.mercadolibre.com/orders/search?seller="+ el_token_completo.user_id +"&order.date_created.from=2015-07-01T00:00:00.000-00:00&order.date_created.to="+ fechaactual +"-12-31T00:00:00.000-00:00&access_token="+el_token_completo.access_token;
+    var murl = "https://api.mercadolibre.com/orders/search?seller="+ token.user_id +"&order.date_created.from=2015-07-01T00:00:00.000-00:00&order.date_created.to="+ fechaactual +"-12-31T00:00:00.000-00:00&access_token="+token.access_token;
     request.get({url: murl}, function (error, response, body) {
         var orders = JSON.parse(body);
         var ordersString = JSON.stringify(orders)

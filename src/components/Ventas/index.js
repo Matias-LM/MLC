@@ -33,15 +33,15 @@ function shipping(ship){
 
 const Item = props => (
 
-    <AccordionItem title={"Comprador: " + props.item.buyer.nickname + " Producto: " + props.item.order_items["0"].item.title}>
-
+    //<AccordionItem title={"Comprador: " + props.item.buyer.nickname + " Producto: " + props.item.order_items["0"].item.title}>
+    <AccordionItem title={props.item.order_items["0"].item.title + " fecha: " + props.item.date_closed.substr(0,10)}>
         <table className="table table-striped" style={{ marginTop: 20 }}>
 
             <thead>
 
                 <tr>
+                    <th>Comprador</th>
 
-                    <th>Fecha</th>
                     <th>Estado</th>
                     <th>Dirección</th>
                     <th>Valor total</th>
@@ -51,7 +51,8 @@ const Item = props => (
             </thead>  
             <tbody>
                 <tr>
-                    <td>{props.item.date_closed.substr(0,10)}</td>
+                    <td>{props.item.buyer.nickname}</td>
+
                     <td>{paid(props.item.status)}</td>
                     <td>{shipping(props.item.shipping.receiver_address)}</td>
                     <td>{"$" + props.item.payments["0"].total_paid_amount}</td>
@@ -83,9 +84,10 @@ class Ventas extends Component {
     }
     
     pedirDatosABackend() {
-        console.log(this.state.desde)
-        console.log(this.state.hasta)
-        if (!this.state.desde || !this.state.hasta) {
+        console.log(this.state.desde==null)
+        console.log(this.state.desde===null)
+        //if (this.state.desde!=null && this.state.hasta!=null) {
+            console.log(this.state)
             console.log('va a hacer el get')
             axios.get('http://localhost:4000/ventasEnOrden',{
                 params: {
@@ -94,15 +96,15 @@ class Ventas extends Component {
                 }})
             .then(res => {
 
-                if(!isEmptyObject(res))
+                if(!isEmptyObject(res)) {
                     console.log(res.data.results)
                     this.setState({ items: res.data.results });
-
+                }
             })
             .catch(function (err){
                 console.log(err);
             });
-        }
+        //}
         }
     
     componentDidMount() {    
@@ -121,25 +123,30 @@ class Ventas extends Component {
     
     handleDayChangeDesde(selectedDay) {
        console.log('handle day desde')
-       this.setState({ desde: selectedDay })
-       this.pedirDatosABackend()
+       this.setState({ desde: selectedDay }, () => this.pedirDatosABackend())
     }
 
     
     handleDayChangeHasta(selectedDay) {
-        this.setState({ hasta: selectedDay })
-        this.pedirDatosABackend()
+        console.log('entro a hasta')
+        this.setState({ hasta: selectedDay }, () => this.pedirDatosABackend())
+        //this.pedirDatosABackend()
     }
 
     render() {
-        
+        var fecha = new Date();
+        //var fechaprime = //2015-07-01
+        var ytoday = fecha.getFullYear();
+        var mtoday = fecha.getMonth()+1;
+        var dtoday = fecha.getDate();
+        var hoy = ytoday + "-" + mtoday + "-" + dtoday
+
         return(
             <div>
                     
-        <DayPickerInput onDayChange={this.handleDayChangeDesde}
-                
+        <DayPickerInput onDayChange={this.handleDayChangeDesde} format='yyyy-mm-dd'placeholder='2015-01-01'
         />
-        <DayPickerInput onDayChange={this.handleDayChangeHasta} format='yyyy-mm-dd'
+        <DayPickerInput onDayChange={this.handleDayChangeHasta} format='yyyy-mm-dd' placeholder={hoy}
         />
 
                 <div className="FollowingItems">
