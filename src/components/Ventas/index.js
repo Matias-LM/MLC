@@ -34,7 +34,7 @@ function shipping(ship){
 const Item = props => (
 
     //<AccordionItem title={"Comprador: " + props.item.buyer.nickname + " Producto: " + props.item.order_items["0"].item.title}>
-    <AccordionItem title={props.item.order_items["0"].item.title + " fecha: " + props.item.date_closed.substr(0,10)}>
+    <AccordionItem title={props.item.order_items["0"].item.title + ", Fecha: " + props.item.date_closed.substr(0,10)}>
         <table className="table table-striped" style={{ marginTop: 20 }}>
 
             <thead>
